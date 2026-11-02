@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Katalog Undangan Digital Interaktif - Berbinar Creative</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- FontAwesome CDN -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- QRCode.js Generator Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<!-- Google Fonts Import -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;700&family=Great+Vibes&family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Sacramento&display=swap" rel="stylesheet">
+​<script>
+tailwind.config = {
+theme: {
+extend: {
+fontFamily: {
+sans: ['Inter', 'sans-serif'],
+serif: ['Playfair Display', 'serif'],
+cinzel: ['Cinzel', 'serif'],
+cursive: ['Great Vibes', 'cursive'],
+sacramento: ['Sacramento', 'cursive'],
+amiri: ['Amiri', 'serif'],
+},
+colors: {
+brandPrimary: '#db2777',
+gold: {
+100: '#fef9c3',
+300: '#fde047',
+500: '#eab308',
+600: '#ca8a04',
+700: '#a16207',
+}
+}
+}
+}
+}
+</script>
+<style>
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #f1f1f1; }
+::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 3px; }
+​.modal-overlay {
+position: fixed;
+top: 0; left: 0; width: 100%; height: 100%;
+background: rgba(0, 0, 0, 0.65);
+backdrop-filter: blur(4px);
+display: flex; justify-content: center; align-items: center;
+opacity: 0; visibility: hidden; transition: all 0.3s ease;
+padding: 16px; z-index: 9999;
+}
+​.modal-overlay.active { opacity: 1; visibility: visible; }
+​.modal-content {
+background: #ffffff; padding: 24px; border-radius: 20px;
+text-align: center; max-width: 440px; width: 100%;
+transform: scale(0.88); transition: all 0.3s ease;
+box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+max-height: 90vh; overflow-y: auto;
+}
+​.modal-overlay.active .modal-content { transform: scale(1); }
+​#qrcode-box { display: flex; justify-content: center; margin: 16px 0; }
+​.modal-guest-name {
+font-family: 'Playfair Display', serif;
+font-size: 20px; font-weight: bold; font-style: italic; color: #1f2937;
+}
+​.btn-close {
+background: #f3f4f6; color: #374151; border: none;
+padding: 8px 24px; border-radius: 20px; cursor: pointer;
+font-weight: bold; font-size: 13px; margin-top: 15px; transition: all 0.2s;
+}
+.btn-close:hover { background: #e5e7eb; }
+</style>
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans antialiased h-screen flex flex-col md:flex-row overflow-hidden">
+​<!-- ==================== SIDEBAR CONTROL PANEL ==================== -->
+<aside id="sidebar" class="w-full md:w-96 bg-white border-r border-gray-200 flex flex-col h-auto md:h-full z-20 shadow-xl transition-all duration-300">
+<!-- Header Sidebar -->
+<div class="p-4 border-b border-gray-200 bg-slate-900 text-white flex justify-between items-center" id="brandHeaderBg">
+<div class="flex items-center space-x-2.5">
+<img id="appBrandLogo" src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=80&q=80" class="w-8 h-8 rounded-full border border-pink-400 object-cover" alt="Brand Logo">
+<h1 id="appBrandTitle" class="font-bold text-base tracking-wide">Berbinar Creative</h1>
+</div>
+<div class="flex items-center space-x-2">
+<button onclick="openContactModal()" class="text-pink-400 hover:text-pink-300 text-xs px-2 py-1 bg-white/10 rounded-lg flex items-center space-x-1" title="Hubungi CS / Konsultasi">
+<i class="fa-brands fa-whatsapp text-green-400"></i>
+<span>Bantuan</span>
+</button>
+<button id="toggleMobileSidebar" class="md:hidden text-gray-300 hover:text-white">
+<i class="fa-solid fa-bars text-xl"></i>
+</button>
+</div>
+</div>
+​<!-- Scrollable Controls -->
+<div class="p-4 overflow-y-auto flex-1 space-y-5">
+​<!-- MODE TAMPILAN WEB -->
+<div class="bg-pink-50 p-2.5 rounded-xl border border-pink-200 space-y-2">
+<span class="text-[11px] font-bold uppercase tracking-wider text-pink-700 block text-center">
+<i class="fa-solid fa-sliders mr-1"></i> Mode Tampilan Utama
+</span>
+<div class="grid grid-cols-2 gap-1.5 bg-white p-1 rounded-lg border border-pink-100 text-xs font-semibold">
+<button id="navBtnInvitation" onclick="switchAppView('invitation')" class="py-1.5 px-2 rounded-md bg-pink-600 text-white shadow-sm transition flex items-center justify-center space-x-1">
+<i class="fa-solid fa-mobile-screen"></i>
+<span>Undangan</span>
+</button>
+<button id="navBtnLogin" onclick="switchAppView('app-login')" class="py-1.5 px-2 rounded-md text-gray-600 hover:bg-pink-50 transition flex items-center justify-center space-x-1">
+<i class="fa-solid fa-right-to-bracket"></i>
+<span>Layar Login</span>
+</button>
+</div>
+</div>
+​<!-- PANEL INFORMASI AKUN & KONTROL -->
+<div class="bg-gradient-to-r from-slate-900 to-slate-800 p-3 rounded-xl text-white space-y-3 shadow-md border border-slate-700">
+<div class="flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<div class="w-8 h-8 rounded-full bg-pink-500/20 text-pink-400 flex items-center justify-center text-xs font-bold" id="userAvatar">
+<i class="fa-solid fa-user"></i>
+</div>
+<div>
+<span class="text-xs font-bold block leading-tight" id="userRoleBadge">Tamu (Belum Login)</span>
+<span class="text-[10px] text-gray-400 block" id="userNameBadge">Silakan Login / Order</span>
+</div>
+</div>
+<button onclick="switchAppView('app-login')" class="px-2.5 py-1 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-xs font-semibold transition">
+<i class="fa-solid fa-right-to-bracket mr-1"></i> Login
+</button>
+</div>
+​<div class="grid grid-cols-2 gap-2 pt-1 border-t border-slate-700/60">
+<button onclick="openCheckoutModal()" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold text-xs py-2 rounded-lg transition flex items-center justify-center space-x-1.5 shadow">
+<i class="fa-solid fa-cart-shopping"></i>
+<span>Beli / Checkout</span>
+</button>
+<button onclick="openDashboardModal()" class="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold text-xs py-2 rounded-lg transition flex items-center justify-center space-x-1.5">
+<i class="fa-solid fa-gauge-high text-amber-400"></i>
+<span>Dashboard</span>
+</button>
+</div>
+​<!-- Tombol Khusus Super Admin -->
+<div id="superAdminQuickBtn" class="hidden pt-2 border-t border-slate-700">
+<button onclick="openSuperAdminModal()" class="w-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs py-2 rounded-lg transition flex items-center justify-center space-x-1.5 shadow">
+<i class="fa-solid fa-crown text-slate-900"></i>
+<span>Super Admin Panel</span>
+</button>
+</div>
+</div>
+​<!-- KONTROL NAMA TAMU & BARCODE QR -->
+<div class="space-y-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
+<span class="text-xs font-bold text-gray-700 uppercase tracking-wider block">1. Personalisasi Tamu</span>
+<div>
+<label class="block text-[11px] text-gray-500 mb-1">Nama Tamu Undangan (?to=)</label>
+<input type="text" id="guestNameInput" oninput="updateGuestName(this.value)" class="w-full text-xs p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 outline-none" placeholder="Contoh: Budi & Partner">
+</div>
+<div class="flex items-center justify-between pt-1">
+<span class="text-xs text-gray-700 font-medium">Tampilkan QR Check-In</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input type="checkbox" id="toggleQrCheckinSwitch" checked onchange="toggleQRCheckin(this.checked)" class="sr-only peer">
+<div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-pink-600"></div>
+</label>
+</div>
+</div>
+​<!-- TEMA KATALOG PRESET & COLOR PICKER -->
+<div class="space-y-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
+<span class="text-xs font-bold text-gray-700 uppercase tracking-wider block">2. Pilihan Tema & Warna</span>
+<div class="grid grid-cols-2 gap-2 text-xs">
+<button onclick="setTheme('modern')" class="p-2 bg-white border border-pink-200 rounded-lg text-left hover:bg-pink-50 transition">
+<span class="font-bold text-pink-600 block">Modern Pink</span>
+<span class="text-[10px] text-gray-400">Elegan & Soft</span>
+</button>
+<button onclick="setTheme('rosegold')" class="p-2 bg-white border border-rose-200 rounded-lg text-left hover:bg-rose-50 transition">
+<span class="font-bold text-rose-500 block">Rose Gold</span>
+<span class="text-[10px] text-gray-400">Mewah Romantic</span>
+</button>
+<button onclick="setTheme('rustic')" class="p-2 bg-white border border-amber-200 rounded-lg text-left hover:bg-amber-50 transition">
+<span class="font-bold text-amber-800 block">Terracotta</span>
+<span class="text-[10px] text-gray-400">Rustic Nature</span>
+</button>
+<button onclick="setTheme('islamic')" class="p-2 bg-white border border-emerald-200 rounded-lg text-left hover:bg-emerald-50 transition">
+<span class="font-bold text-emerald-700 block">Emerald Islamic</span>
+<span class="text-[10px] text-gray-400">Islami Tradisional</span>
+</button>
+<button onclick="setTheme('ocean')" class="p-2 bg-white border border-cyan-200 rounded-lg text-left hover:bg-cyan-50 transition">
+<span class="font-bold text-cyan-600 block">Ocean Blue</span>
+<span class="text-[10px] text-gray-400">Segar & Clean</span>
+</button>
+<button onclick="setTheme('dark')" class="p-2 bg-slate-800 border border-slate-700 text-white rounded-lg text-left hover:bg-slate-700 transition">
+<span class="font-bold text-pink-400 block">Cyber Dark</span>
+<span class="text-[10px] text-gray-400">Minimalis Malam</span>
+</button>
+</div>
+​<!-- Custom Color Picker -->
+<div class="pt-2 border-t border-gray-200 space-y-2">
+<span class="text-[11px] font-bold text-gray-600 block">Custom Color Palette:</span>
+<div class="grid grid-cols-3 gap-2">
+<div>
+<label class="block text-[10px] text-gray-500">Warna Utama</label>
+<input type="color" id="customPrimaryColor" value="#db2777" class="w-full h-8 rounded border p-0.5 cursor-pointer">
+</div>
+<div>
+<label class="block text-[10px] text-gray-500">Background</label>
+<input type="color" id="customBgColor" value="#ffffff" class="w-full h-8 rounded border p-0.5 cursor-pointer">
+</div>
+<div>
+<label class="block text-[10px] text-gray-500">Teks Utama</label>
+<input type="color" id="customTextColor" value="#1f2937" class="w-full h-8 rounded border p-0.5 cursor-pointer">
+</div>
+</div>
+<button onclick="applyCustomColors()" class="w-full py-1.5 bg-gray-800 text-white rounded-lg text-xs font-semibold hover:bg-gray-900 transition">Terapkan Warna Custom</button>
+</div>
+</div>
+​<!-- DUKUNGAN KONSULTASI & BANTUAN -->
+<div class="p-3 bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-200 rounded-xl space-y-2 text-center">
+<span class="text-xs font-bold text-emerald-800 block">Ada Pertanyaan / Konsultasi?</span>
+<p class="text-[11px] text-gray-600">Tim Berbinar Creative siap membantu proses pembuatan & kustomisasi Anda.</p>
+<div class="flex justify-center space-x-2 pt-1">
+<button onclick="openContactModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition flex items-center space-x-1.5">
+<i class="fa-brands fa-whatsapp text-sm"></i>
+<span>WhatsApp CS</span>
+</button>
+<a href="https://instagram.com/berbinar.creative" target="_blank" class="px-3 py-1.5 bg-pink-600 hover:bg-pink-700 text-white rounded-lg text-xs font-bold transition flex items-center space-x-1.5">
+<i class="fa-brands fa-instagram text-sm"></i>
+<span>Instagram</span>
+</a>
+</div>
+</div>
+​</div>
+</aside>
+​<!-- ==================== MAIN DISPLAY AREA ==================== -->
+<main class="flex-1 bg-slate-200 overflow-y-auto flex justify-center items-center p-0 md:p-6 relative">
+​<!-- CONTAINER 1: PRATINJAU UNDANGAN DIGITAL -->
+<div id="invitationViewContainer" class="w-full flex justify-center items-center">
+<div id="invitationContainer" class="w-full max-w-md bg-white min-h-screen md:min-h-[850px] shadow-2xl relative transition-all duration-300 font-style-serif text-gray-800 my-0 md:my-2 rounded-none md:rounded-3xl overflow-hidden border-0 md:border-8 border-gray-800">
+​<!-- SECTION 1: COVER DEPAN -->
+<section id="coverSection" class="min-h-screen md:min-h-[830px] flex flex-col justify-between p-8 text-center bg-theme-primary relative z-10">
+<div class="pt-6 space-y-2">
+<span class="text-xs font-sans tracking-widest uppercase text-pink-600 font-bold block">The Wedding Of</span>
+<h1 id="coverCoupleDisplay" class="couple-name-text text-3xl md:text-4xl font-bold font-serif text-gray-800 my-2">Rizky & Annisa</h1>
+<p id="coverDateDisplay" class="text-xs font-sans text-gray-600 font-medium tracking-wide">Minggu, 24 Oktober 2026</p>
+</div>
+​<div class="my-6 py-6 border-y border-pink-200/60 bg-white/40 backdrop-blur-sm rounded-2xl p-4 shadow-sm">
+<p class="text-xs font-sans text-gray-500 mb-2">Kepada Yth. Bapak/Ibu/Saudara/i:</p>
+<h2 id="coverGuestNameDisplay" class="text-xl font-bold text-gray-800 font-serif italic">Bapak / Ibu / Saudara</h2>
+<span class="inline-block mt-2 text-[10px] bg-pink-100 text-pink-700 px-3 py-1 rounded-full font-sans font-semibold">Di Tempat</span>
+</div>
+​<div class="pb-6 space-y-3">
+<div id="qrCheckinBtnContainer" class="flex justify-center">
+<button class="w-12 h-12 bg-pink-600 hover:bg-pink-700 text-white rounded-full flex items-center justify-center shadow-lg transition transform hover:scale-105" onclick="openQRModal()" title="Lihat Barcode Check-In">
+<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+<path d="M3 3h8v8H3V3zm2 2v4h4V5H5zm8-2h8v8h-8V3zm2 2v4h4V5h-4zM3 13h8v8H3v-8zm2 2v4h4v-4H5zm13-2h3v2h-3v-2zm-3 0h2v3h-2v-3zm3 3h3v5h-2v-3h-1v-2zm-3 2h2v3h-2v-3zm0 3h5v2h-5v-2z"/>
+</svg>
+</button>
+</div>
+​<button onclick="openInvitation()" class="w-full py-3.5 px-6 bg-slate-900 hover:bg-slate-800 text-white font-sans text-xs font-bold rounded-full shadow-xl transition transform active:scale-95 flex items-center justify-center space-x-2">
+<i class="fa-solid fa-envelope-open text-pink-400"></i>
+<span>Buka Undangan</span>
+</button>
+</div>
+</section>
+​<!-- SECTION ISI UNDANGAN -->
+<div id="invitationContent" class="hidden">
+<section id="section-quran" class="p-8 text-center bg-pink-50/40 space-y-4">
+<div class="w-10 h-10 mx-auto rounded-full bg-pink-100 text-pink-600 flex items-center justify-center text-lg mb-2">
+<i class="fa-solid fa-heart-pulse"></i>
+</div>
+<div id="quranArabicDisplay" class="font-amiri text-2xl text-gray-800 leading-relaxed dir-rtl" dir="rtl">
+وَمِنْ آيَاتِهِ أَنْ خَلَقَ لَكُم مِّنْ أَنفُسِكُمْ أَزْوَاجًا لِّتَسْكُنُوا إِلَيْهَا وَجَعَلَ بَيْنَكُم مَّوَدَّةً وَرَحْمَةً
+</div>
+<p id="quranTranslationDisplay" class="text-xs text-gray-600 leading-relaxed font-sans italic">
+"Dan di antara tanda-tanda kekuasaan-Nya ialah Dia menciptakan untukmu isteri-isteri dari meismu sendiri, supaya kamu cenderung dan merasa tenteram kepadanya, dan dijadikan-Nya diantaramu rasa kasih dan sayang."
+</p>
+<span id="quranSurahDisplay" class="inline-block text-xs font-bold text-pink-600 tracking-wider font-sans uppercase">(QS. Ar-Rum: 21)</span>
+</section>
+​<section id="section-mempelai" class="p-8 space-y-8 bg-white text-center">
+<div class="space-y-2">
+<span class="text-xs font-sans tracking-widest uppercase text-pink-600 font-bold">Mempelai</span>
+<h3 class="text-2xl font-bold text-gray-800">Pasangan Bahagia</h3>
+</div>
+​<div class="space-y-3">
+<div class="w-28 h-28 mx-auto rounded-full overflow-hidden border-4 border-pink-200 shadow-lg">
+<img id="groomImgDisplay" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80" class="w-full h-full object-cover" alt="Mempelai Pria">
+</div>
+<div>
+<h4 id="groomNameDisplay" class="groom-name-text text-xl font-bold text-pink-600">Rizky Pratama, S.T.</h4>
+<p class="text-xs text-gray-500 font-sans mt-1">Putra dari Bapak H. Ahmad & Ibu Hj. Siti</p>
+</div>
+</div>
+​<div class="text-pink-400 text-2xl font-serif">&</div>
+​<div class="space-y-3">
+<div class="w-28 h-28 mx-auto rounded-full overflow-hidden border-4 border-pink-200 shadow-lg">
+<img id="brideImgDisplay" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80" class="w-full h-full object-cover" alt="Mempelai Wanita">
+</div>
+<div>
+<h4 id="brideNameDisplay" class="bride-name-text text-xl font-bold text-pink-600">Annisa Larasati, S.Ked.</h4>
+<p class="text-xs text-gray-500 font-sans mt-1">Putri dari Bapak Drs. Bambang & Ibu Hj. Rina</p>
+</div>
+</div>
+</section>
+​<!-- SECTION AMPLOP & KADO (TEKS TERTULIS KIRIM KADO) -->
+<section id="section-amplop" class="p-8 bg-pink-50/50 space-y-6 text-center">
+<div class="space-y-1">
+<h3 class="text-2xl font-bold text-gray-800">Amplop Digital & Kado</h3>
+<p class="text-xs text-gray-500 font-sans">Doa restu Anda merupakan karunia yang terindah bagi kami. Namun jika ingin memberi hadiah, Anda dapat menggunakan amplop digital di bawah ini:</p>
+</div>
+​<div class="bg-white p-5 rounded-xl border border-pink-100 shadow-sm space-y-3">
+<div class="flex justify-between items-center border-b pb-2">
+<span id="bank1Name" class="font-bold text-sm text-blue-800">BANK BCA</span>
+<i class="fa-solid fa-credit-card text-gray-400"></i>
+</div>
+<div class="text-left font-sans">
+<p class="text-xs text-gray-500">Nomor Rekening:</p>
+<p id="rekening1" class="text-lg font-bold text-gray-800 tracking-wider">1234567890</p>
+<p class="text-xs text-gray-600 mt-1">a.n. Rizky Pratama</p>
+</div>
+<button onclick="copyToClipboard(document.getElementById('rekening1').innerText, 'Nomor Rekening Bank')" class="w-full bg-pink-50 hover:bg-pink-100 text-pink-600 font-sans text-xs font-semibold py-2 rounded-lg transition flex items-center justify-center space-x-1">
+<i class="fa-regular fa-copy"></i>
+<span>Salin No. Rekening</span>
+</button>
+</div>
+​<div class="bg-white p-5 rounded-xl border border-pink-100 shadow-sm text-left space-y-2 font-sans">
+<div class="flex items-center space-x-2 text-pink-600 font-bold text-sm border-b pb-2">
+<i class="fa-solid fa-box-archive"></i>
+<span>Kirim Kado</span>
+</div>
+<p class="text-xs text-gray-600 leading-relaxed">
+<span class="font-bold text-gray-800">Alamat Penerima:</span>
+
+<span id="kadoAddressDisplay">Jl. Kenanga No. 45, Cilandak, Jakarta Selatan, 12430</span>
+</p>
+<button onclick="copyToClipboard(document.getElementById('kadoAddressDisplay').innerText, 'Alamat Rumah')" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold py-2 rounded-lg transition flex items-center justify-center space-x-1">
+<i class="fa-regular fa-copy"></i>
+<span>Salin Alamat Rumah</span>
+</button>
+</div>
+</section>
+​<!-- SECTION FOOTER PENUTUP -->
+<footer class="p-8 bg-slate-900 text-white text-center space-y-4">
+<p class="text-xs text-gray-400 font-sans leading-relaxed">
+Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir untuk memberikan doa restu.
+</p>
+<h4 class="couple-name-text text-2xl font-serif font-bold text-pink-400">Rizky & Annisa</h4>
+<div class="pt-4 border-t border-slate-800">
+<span class="text-[10px] text-gray-500 font-sans uppercase tracking-widest block" id="footerPoweredText">Powered by Berbinar Creative</span>
+</div>
+</footer>
+</div>
+</div>
+</div>
+​<!-- CONTAINER 2: LAYAR LOGIN APLIKASI -->
+<div id="appLoginViewContainer" class="w-full max-w-4xl min-h-[600px] bg-white rounded-2xl shadow-2xl overflow-hidden hidden flex-col md:flex-row border border-gray-200 transition-all duration-300">
+<!-- Left Branding Banner -->
+<div class="w-full md:w-1/2 bg-gradient-to-br from-slate-900 via-slate-800 to-pink-950 p-8 text-white flex flex-col justify-between relative overflow-hidden">
+<div class="space-y-2 z-10">
+<div class="inline-flex items-center space-x-2 bg-pink-500/20 border border-pink-500/30 px-3 py-1 rounded-full text-pink-300 text-xs font-semibold">
+<i class="fa-solid fa-heart"></i>
+<span>Berbinar Creative Platform</span>
+</div>
+<h2 class="text-3xl font-extrabold tracking-tight pt-2">Kelola Undangan Digital</h2>
+<p class="text-xs text-gray-300 leading-relaxed pt-1">
+Sistem manajemen undangan digital serba ada. Edit konten mempelai, kelola QR check-in tamu, dan pantau RSVP ucapan.
+</p>
+</div>
+​<div class="space-y-3 z-10 pt-6">
+<div class="flex items-center space-x-3 text-xs text-gray-300">
+<div class="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-pink-400">
+<i class="fa-solid fa-qrcode"></i>
+</div>
+<span>QR Code Check-In Tamu Otomatis</span>
+</div>
+<div class="flex items-center space-x-3 text-xs text-gray-300">
+<div class="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-pink-400">
+<i class="fa-solid fa-shield-halved"></i>
+</div>
+<span>Akses Akselerasi Super Admin Control</span>
+</div>
+</div>
+​<div class="pt-6 border-t border-slate-700/60 z-10 text-[11px] text-gray-400 flex justify-between items-center">
+<span>© 2026 Berbinar Creative</span>
+<button onclick="switchAppView('invitation')" class="text-pink-400 hover:text-pink-300 font-semibold underline">
+← Kembali ke Pratinjau
+</button>
+</div>
+</div>
+​<!-- Right Login Form Section -->
+<div class="w-full md:w-1/2 p-8 bg-white flex flex-col justify-center">
+<div class="flex border-b border-gray-200 mb-6 text-xs font-bold">
+<button id="tabAuthLogin" onclick="switchAuthTab('login')" class="pb-2.5 px-4 text-pink-600 border-b-2 border-pink-600 transition flex items-center space-x-1.5">
+<i class="fa-solid fa-right-to-bracket"></i>
+<span>Login Akun</span>
+</button>
+<button id="tabAuthRegister" onclick="switchAuthTab('register')" class="pb-2.5 px-4 text-gray-400 hover:text-gray-600 border-b-2 border-transparent transition flex items-center space-x-1.5">
+<i class="fa-solid fa-user-plus"></i>
+<span>Daftar Baru</span>
+</button>
+</div>
+​<form id="appLoginForm" onsubmit="handleFullAppLogin(event)" class="space-y-4">
+<div>
+<label class="block text-xs font-bold text-gray-700 mb-1">Email / ID Pengguna</label>
+<input type="email" id="fullAuthEmail" required value="client@berbinar.com" class="w-full text-xs px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none" placeholder="email@domain.com">
+</div>
+​<div>
+<label class="block text-xs font-bold text-gray-700 mb-1">Kata Sandi</label>
+<input type="password" id="fullAuthPassword" required value="password123" class="w-full text-xs px-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none" placeholder="••••••••">
+</div>
+​<div>
+<label class="block text-xs font-bold text-gray-700 mb-1">Login Sebagai</label>
+<select id="fullAuthRole" class="w-full text-xs p-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-pink-500 outline-none">
+<option value="client">Pembeli (Client Undangan)</option>
+<option value="admin">Pemilik Web (Admin)</option>
+<option value="superadmin">Super Admin (Hak Akses Penuh)</option>
+</select>
+</div>
+​<button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3 rounded-xl transition shadow-lg flex items-center justify-center space-x-2">
+<span>Masuk Dashboard</span>
+<i class="fa-solid fa-arrow-right text-pink-400"></i>
+</button>
+</form>
+</div>
+</div>
+​</main>
+​<!-- MODAL SUPER ADMIN CONTROL PANEL (SUPER ADMIN ONLY) -->
+<div class="modal-overlay" id="superAdminModal">
+<div class="modal-content text-left max-w-xl">
+<div class="flex justify-between items-center mb-4 border-b pb-3">
+<div class="flex items-center space-x-2">
+<i class="fa-solid fa-crown text-amber-500 text-xl"></i>
+<h3 class="font-bold text-lg text-slate-900">Super Admin Management Panel</h3>
+</div>
+<button onclick="closeSuperAdminModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+</div>
+​<div class="space-y-5 font-sans text-xs">
+​<!-- 1. PENGATURAN LOGO & TEMA PLATFORM -->
+<div class="bg-amber-50 p-3.5 rounded-xl border border-amber-200 space-y-3">
+<span class="font-bold text-amber-900 text-xs block uppercase tracking-wider">
+<i class="fa-solid fa-palette mr-1"></i> Branding Logo & Tema Aplikasi Web
+</span>
+<div class="grid grid-cols-2 gap-3">
+<div>
+<label class="block text-[11px] font-semibold text-gray-700 mb-1">Nama Brand Aplikasi</label>
+<input type="text" id="adminBrandNameInput" value="Berbinar Creative" oninput="updateBrandName(this.value)" class="w-full p-2 text-xs border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none">
+</div>
+<div>
+<label class="block text-[11px] font-semibold text-gray-700 mb-1">URL Logo Website</label>
+<input type="text" id="adminBrandLogoInput" oninput="updateBrandLogo(this.value)" placeholder="https://..." class="w-full p-2 text-xs border border-amber-300 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none">
+</div>
+</div>
+</div>
+​<!-- 2. MANAJEMEN AKUN PEMBELI (CLIENTS) -->
+<div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-3">
+<span class="font-bold text-slate-800 text-xs block uppercase tracking-wider">
+<i class="fa-solid fa-users-gear mr-1"></i> Pengaturan & Kelola Akun Pembeli (Client)
+</span>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-200 text-slate-700 text-[10px] uppercase font-bold">
+<th class="p-2 rounded-l">Client Email</th>
+<th class="p-2">Status Paket</th>
+<th class="p-2">Aksi Pengaturan</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-200">
+<tr>
+<td class="p-2 font-medium">budi@gmail.com</td>
+<td class="p-2"><span class="px-2 py-0.5 bg-green-100 text-green-700 rounded text-[10px] font-bold">LUNAS</span></td>
+<td class="p-2 space-x-1">
+<button onclick="resetBuyerPassword('budi@gmail.com')" class="px-2 py-1 bg-amber-500 text-white rounded text-[10px] font-bold">Reset Pass</button>
+<button onclick="toggleBuyerAccess('budi@gmail.com')" class="px-2 py-1 bg-red-600 text-white rounded text-[10px] font-bold">Block</button>
+</td>
+</tr>
+<tr>
+<td class="p-2 font-medium">siti.wedding@yahoo.com</td>
+<td class="p-2"><span class="px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-bold">PENDING</span></td>
+<td class="p-2 space-x-1">
+<button onclick="approveBuyerPayment('siti.wedding@yahoo.com')" class="px-2 py-1 bg-emerald-600 text-white rounded text-[10px] font-bold">Verifikasi</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+​<!-- 3. SAKELAR SISTEM SUPER ADMIN -->
+<div class="bg-gray-50 p-3 rounded-xl border border-gray-200 flex justify-between items-center">
+<div>
+<span class="font-bold text-gray-800 block">Mode Pemeliharaan (Maintenance System)</span>
+<span class="text-[10px] text-gray-500">Nonaktifkan fitur edit sementara untuk pemeliharaan server.</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input type="checkbox" onchange="toggleMaintenance(this.checked)" class="sr-only peer">
+<div class="w-9 h-5 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+</label>
+</div>
+​</div>
+</div>
+</div>
+​<!-- MODAL KONTAK & CONSULTATION BANTUAN -->
+<div class="modal-overlay" id="contactModal">
+<div class="modal-content text-left max-w-sm">
+<div class="flex justify-between items-center mb-3 border-b pb-2">
+<h3 class="font-bold text-base text-gray-800"><i class="fa-solid fa-headset text-emerald-600 mr-2"></i>Konsultasi & Bantuan</h3>
+<button onclick="closeContactModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+</div>
+<div class="space-y-3 font-sans text-xs">
+<p class="text-gray-600 leading-relaxed">Punya pertanyaan seputar kustomisasi tema, paket undangan, atau kendala pembayaran? Silakan hubungi tim kami:</p>
+​<a href="https://wa.me/6281234567890?text=Halo%20Berbinar%20Creative,%20saya%20ingin%20konsultasi%20undangan%20digital" target="_blank" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold p-3 rounded-xl transition flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<i class="fa-brands fa-whatsapp text-xl"></i>
+<div>
+<span class="block leading-tight text-xs">WhatsApp Official</span>
+<span class="text-[10px] text-emerald-200">+62 812-3456-7890</span>
+</div>
+</div>
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</a>
+​<a href="https://instagram.com/berbinar.creative" target="_blank" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:opacity-95 text-white font-bold p-3 rounded-xl transition flex items-center justify-between">
+<div class="flex items-center space-x-2">
+<i class="fa-brands fa-instagram text-xl"></i>
+<div>
+<span class="block leading-tight text-xs">Instagram Direct</span>
+<span class="text-[10px] text-pink-200">@berbinar.creative</span>
+</div>
+</div>
+<i class="fa-solid fa-chevron-right text-xs"></i>
+</a>
+</div>
+</div>
+</div>
+​<!-- Modal Pop-up QR Code -->
+<div class="modal-overlay" id="qrModal">
+<div class="modal-content">
+<h3 style="font-size: 18px; font-weight: bold; color: #2b2d42;">QR Code Check-In</h3>
+<p style="font-size: 12px; color: #666; margin-top: 4px;">Tunjukkan saat memasuki acara</p>
+<div id="qrcode-box"></div>
+<div class="modal-guest-name" id="modal-guest-info"></div>
+<button class="btn-close" onclick="closeQRModal()">Tutup</button>
+</div>
+</div>
+​<!-- Modal Checkout / Pembelian -->
+<div class="modal-overlay" id="checkoutModal">
+<div class="modal-content text-left max-w-md">
+<div class="flex justify-between items-center mb-3">
+<h3 class="font-bold text-base text-gray-800"><i class="fa-solid fa-credit-card text-pink-600 mr-2"></i>Checkout & Pembayaran Paket</h3>
+<button onclick="closeCheckoutModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+</div>
+<div class="bg-pink-50 p-3 rounded-lg mb-3 border border-pink-100 flex justify-between items-center font-sans">
+<div>
+<span class="text-xs font-bold text-gray-800 block">Paket Undangan Digital Full Fitur</span>
+<span class="text-[10px] text-pink-600 font-semibold">Aktif Selamanya & Unlimited Tamu</span>
+</div>
+<span class="text-sm font-extrabold text-pink-600">Rp 150.000</span>
+</div>
+<div class="space-y-3 font-sans">
+<label class="block text-xs font-bold text-gray-700">Pilih Metode Pembayaran:</label>
+<div class="grid grid-cols-3 gap-2">
+<button onclick="selectPaymentMethod('qris')" id="btn-pay-qris" class="p-2 border border-pink-500 bg-pink-50 rounded-lg text-center text-xs font-semibold hover:border-pink-500 transition">
+<i class="fa-solid fa-qrcode text-pink-600 block text-lg mb-1"></i> QRIS
+</button>
+<button onclick="selectPaymentMethod('bank')" id="btn-pay-bank" class="p-2 border border-gray-200 rounded-lg text-center text-xs font-semibold hover:border-pink-500 transition">
+<i class="fa-solid fa-building-columns text-blue-600 block text-lg mb-1"></i> Bank Direct
+</button>
+<button onclick="selectPaymentMethod('wallet')" id="btn-pay-wallet" class="p-2 border border-gray-200 rounded-lg text-center text-xs font-semibold hover:border-pink-500 transition">
+<i class="fa-solid fa-wallet text-orange-500 block text-lg mb-1"></i> ShopeePay
+</button>
+</div>
+<div id="paymentDetailsContainer" class="bg-gray-50 p-3 rounded-lg border border-gray-200 text-xs"></div>
+<button onclick="confirmCheckout()" class="w-full bg-pink-600 hover:bg-pink-700 text-white font-bold text-xs py-2.5 rounded-lg transition shadow">Konfirmasi Pembayaran</button>
+</div>
+</div>
+</div>
+​<!-- Modal Dashboard -->
+<div class="modal-overlay" id="dashboardModal">
+<div class="modal-content text-left max-w-lg">
+<div class="flex justify-between items-center mb-4 border-b pb-2">
+<h3 class="font-bold text-lg text-gray-800" id="dashboardTitle"><i class="fa-solid fa-gauge-high text-pink-600 mr-2"></i>Dashboard Pengelola</h3>
+<button onclick="closeDashboardModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+</div>
+<div id="dashboardContent" class="space-y-4 font-sans text-xs"></div>
+</div>
+</div>
+​<!-- Toast Notification -->
+<div id="toast" class="fixed bottom-4 right-4 bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-50 flex items-center space-x-2">
+<i class="fa-solid fa-circle-check text-green-400"></i>
+<span id="toastMessage">Notifikasi</span>
+</div>
+​<script>
+const urlParams = new URLSearchParams(window.location.search);
+const initialGuestName = urlParams.get('to') || 'Bapak / Ibu / Saudara';
+let currentUser = null;
+let qrCodeObj = null;
+​window.addEventListener('DOMContentLoaded', () => {
+const guestInput = document.getElementById('guestNameInput');
+if (guestInput) guestInput.value = initialGuestName;
+updateGuestName(initialGuestName);
+selectPaymentMethod('qris');
+​const qrBox = document.getElementById("qrcode-box");
+if (qrBox && typeof QRCode !== 'undefined') {
+qrCodeObj = new QRCode(qrBox, {
+text: initialGuestName, width: 170, height: 170,
+colorDark: "#2b2d42", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H
+});
+}
+});
+​// App View Handler
+function switchAppView(view) {
+const invContainer = document.getElementById('invitationViewContainer');
+const loginContainer = document.getElementById('appLoginViewContainer');
+const btnInv = document.getElementById('navBtnInvitation');
+const btnLogin = document.getElementById('navBtnLogin');
+​if (view === 'app-login') {
+invContainer.classList.add('hidden');
+loginContainer.classList.remove('hidden');
+loginContainer.classList.add('flex');
+btnInv.className = "py-1.5 px-2 rounded-md text-gray-600 hover:bg-pink-50 transition flex items-center justify-center space-x-1";
+btnLogin.className = "py-1.5 px-2 rounded-md bg-pink-600 text-white shadow-sm transition flex items-center justify-center space-x-1";
+} else {
+loginContainer.classList.add('hidden');
+loginContainer.classList.remove('flex');
+invContainer.classList.remove('hidden');
+btnLogin.className = "py-1.5 px-2 rounded-md text-gray-600 hover:bg-pink-50 transition flex items-center justify-center space-x-1";
+btnInv.className = "py-1.5 px-2 rounded-md bg-pink-600 text-white shadow-sm transition flex items-center justify-center space-x-1";
+}
+}
+​// Handle Login Multi Role (Client, Admin, Super Admin)
+function handleFullAppLogin(e) {
+e.preventDefault();
+const email = document.getElementById('fullAuthEmail').value;
+const role = document.getElementById('fullAuthRole').value;
+​currentUser = { email: email, name: email.split('@')[0], role: role };
+​const userRoleBadge = document.getElementById('userRoleBadge');
+const userNameBadge = document.getElementById('userNameBadge');
+const userAvatar = document.getElementById('userAvatar');
+const superAdminBtn = document.getElementById('superAdminQuickBtn');
+​if (role === 'superadmin') {
+userRoleBadge.innerText = 'Super Admin (Akses Penuh)';
+userAvatar.innerHTML = '<i class="fa-solid fa-crown text-amber-400"></i>';
+superAdminBtn.classList.remove('hidden');
+openSuperAdminModal();
+} else if (role === 'admin') {
+userRoleBadge.innerText = 'Pemilik / Admin Web';
+userAvatar.innerHTML = '<i class="fa-solid fa-user-shield"></i>';
+superAdminBtn.classList.add('hidden');
+openDashboardModal();
+} else {
+userRoleBadge.innerText = 'Pembeli (Client)';
+userAvatar.innerHTML = '<i class="fa-solid fa-user-check"></i>';
+superAdminBtn.classList.add('hidden');
+openDashboardModal();
+}
+​userNameBadge.innerText = currentUser.name;
+showToast(Login Berhasil sebagai ${role.toUpperCase()});
+}
+​// Super Admin Controls
+function openSuperAdminModal() {
+document.getElementById('superAdminModal').classList.add('active');
+}
+​function closeSuperAdminModal() {
+document.getElementById('superAdminModal').classList.remove('active');
+}
+​function updateBrandName(val) {
+const title = val || 'Berbinar Creative';
+document.getElementById('appBrandTitle').innerText = title;
+document.getElementById('footerPoweredText').innerText = Powered by ${title};
+}
+​function updateBrandLogo(url) {
+if (url) {
+document.getElementById('appBrandLogo').src = url;
+}
+}
+​function resetBuyerPassword(email) {
+showToast(Sandi akun ${email} berhasil di-reset ke default!);
+}
+​function toggleBuyerAccess(email) {
+showToast(Akses client ${email} diperbarui (diblokir/dibuka).);
+}
+​function approveBuyerPayment(email) {
+showToast(Pembayaran ${email} Diverifikasi oleh Super Admin!);
+}
+​function toggleMaintenance(active) {
+showToast(active ? "Mode Pemeliharaan Server AKTIF" : "Mode Pemeliharaan Server NONAKTIF");
+}
+​// Contact Modal Controls
+function openContactModal() { document.getElementById('contactModal').classList.add('active'); }
+function closeContactModal() { document.getElementById('contactModal').classList.remove('active'); }
+​// General Modals & Handlers
+function showToast(msg) {
+const toast = document.getElementById('toast');
+document.getElementById('toastMessage').innerText = msg;
+toast.classList.remove('opacity-0', 'pointer-events-none');
+setTimeout(() => toast.classList.add('opacity-0', 'pointer-events-none'), 3000);
+}
+​function copyToClipboard(text, label) {
+navigator.clipboard.writeText(text).then(() => showToast(${label} berhasil disalin!));
+}
+​function updateGuestName(name) {
+const val = name || 'Bapak / Ibu / Saudara';
+document.getElementById('coverGuestNameDisplay').innerText = val;
+document.getElementById('modal-guest-info').innerText = val;
+if (qrCodeObj) { qrCodeObj.clear(); qrCodeObj.makeCode(val); }
+}
+​function openInvitation() {
+document.getElementById('coverSection').classList.add('hidden');
+document.getElementById('invitationContent').classList.remove('hidden');
+}
+​function toggleQRCheckin(enabled) {
+document.getElementById('qrCheckinBtnContainer').classList.toggle('hidden', !enabled);
+}
+​function openQRModal() { document.getElementById('qrModal').classList.add('active'); }
+function closeQRModal() { document.getElementById('qrModal').classList.remove('active'); }
+​function openCheckoutModal() { document.getElementById('checkoutModal').classList.add('active'); }
+function closeCheckoutModal() { document.getElementById('checkoutModal').classList.remove('active'); }
+​function selectPaymentMethod(type) {
+const container = document.getElementById('paymentDetailsContainer');
+if (type === 'qris') {
+container.innerHTML = <div class="text-center p-2"><span class="font-bold">Scan QRIS Instant</span><br><img src="https://api.qrserver.com/v1/create-qr-code/?size=130x130&data=BerbinarPayment" class="mx-auto my-2"></div>;
+} else if (type === 'bank') {
+container.innerHTML = <p class="font-bold">Virtual Account BCA: 88012345678901</p>;
+} else {
+container.innerHTML = <p class="font-bold">ShopeePay Direct: 081234567890</p>;
+}
+}
+​function confirmCheckout() {
+closeCheckoutModal();
+showToast("Pesanan Berhasil Disimpan!");
+}
+​function openDashboardModal() {
+document.getElementById('dashboardModal').classList.add('active');
+document.getElementById('dashboardContent').innerHTML = <p class="p-2 bg-pink-50 rounded">Status Paket: <b>AKTIF & LUNAS</b></p>;
+}
+function closeDashboardModal() { document.getElementById('dashboardModal').classList.remove('active'); }
+​function applyCustomColors() {
+const primary = document.getElementById('customPrimaryColor').value;
+const bg = document.getElementById('customBgColor').value;
+const text = document.getElementById('customTextColor').value;
+​const container = document.getElementById('invitationContainer');
+container.style.backgroundColor = bg;
+container.style.color = text;
+showToast("Warna kustom diterapkan!");
+}
+​function setTheme(theme) {
+showToast(Tema ${theme} berhasil diterapkan);
+}
+</script>
+</body>
+</html>
